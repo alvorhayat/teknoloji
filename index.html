@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ALVOR — Panik anında doğru karar, doğru zaman</title>
+<meta name="description" content="ALVOR: GPS ve GSM entegreli, taşınabilir akıllı ilk yardım destek sistemi. Acil durumda yönlendirir, konumu acil ekiplere iletir.">
+<meta property="og:title" content="ALVOR — Akıllı ilk yardım destek sistemi">
+<meta property="og:description" content="Acil durumda kritik soruları sorar, doğru ilk yardım adımını yönlendirir; konumu GSM ile acil ekiplere iletir.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#FAFAF7">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 178'%3E%3Cg fill='none' stroke='%23C1272D' stroke-width='24'%3E%3Cpath d='M100 26 L34 166'/%3E%3Cpath d='M100 26 L166 166'/%3E%3C/g%3E%3Cpath d='M22 154h44v12H22z' fill='%23C1272D'/%3E%3Cpath d='M134 154h44v12h-44z' fill='%23C1272D'/%3E%3Ccircle cx='100' cy='112' r='15' fill='none' stroke='%23C1272D' stroke-width='11'/%3E%3Crect x='94' y='126' width='12' height='40' fill='%23C1272D'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&family=Archivo:wdth,wght@100..120,400..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FAFAF7;
+  --ink:#171512;
+  --gray:#6D685F;
+  --line:#E8E5DE;
+  --line-strong:#D9D5CC;
+  --tint:#F2F0EA;
+  --red:#C1272D;
+  --red-deep:#9E1F24;
+  --red-hot:#D8353C;
+  --dark:#16140F;
+  --screen:#0B0A09;
+  --ok:#58B368;
+  --amber:#D9A13B;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Archivo',system-ui,sans-serif;
+  font-size:16.5px;
+  line-height:1.65;
+  color:var(--ink);
+  background:var(--paper);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--red);color:#fff}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px}
+a{color:inherit}
+img,svg{display:block}
+
+h1,h2,.thesis{
+  font-family:'Newsreader',Georgia,serif;
+  font-weight:500;
+  letter-spacing:-.01em;
+  text-wrap:balance;
+}
+h1{font-size:clamp(40px,5.4vw,66px);line-height:1.05;margin-bottom:26px}
+h1 em{font-style:italic;color:var(--red)}
+h2{font-size:clamp(28px,3.5vw,42px);line-height:1.12;margin:18px 0 16px}
+
+.label{
+  font-size:11.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--gray);display:flex;align-items:center;gap:10px;
+}
+.label::before{content:"";width:7px;height:7px;background:var(--red);flex:none}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(250,250,247,.92);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.brand svg{height:26px;width:auto}
+.brand span{font-size:14px;font-weight:700;letter-spacing:.22em;transform:translateY(1px)}
+.nav-right{display:flex;align-items:center;gap:28px}
+.nav-links{display:flex;gap:26px}
+.nav-links a{
+  text-decoration:none;font-size:14px;font-weight:500;color:var(--gray);
+  transition:color .2s ease;
+}
+.nav-links a:hover{color:var(--ink)}
+.lang{display:flex;align-items:center;gap:3px;font-size:12.5px;font-weight:600}
+.lang button{
+  font:inherit;background:none;border:0;cursor:pointer;padding:4px 3px;
+  color:var(--gray);letter-spacing:.04em;transition:color .2s;
+}
+.lang button:hover{color:var(--ink)}
+.lang button.on{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-color:var(--red);text-decoration-thickness:2px}
+.lang i{color:var(--line-strong);font-style:normal}
+.lang button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+/* ---------- hero ---------- */
+.hero{padding:88px 0 76px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:72px;align-items:center}
+.hero .label{margin-bottom:26px}
+.lead{font-size:18px;color:var(--gray);max-width:48ch;margin-bottom:38px}
+.cta-row{display:flex;align-items:center;gap:30px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:15px 28px;font-size:15px;font-weight:600;letter-spacing:.01em;
+  text-decoration:none;border-radius:3px;border:0;cursor:pointer;
+  transition:background .2s ease;
+}
+.btn .arr{transition:transform .25s ease}
+.btn:hover .arr{transform:translateX(3px)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-deep)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.link-quiet{
+  font-size:15px;font-weight:600;text-decoration:none;color:var(--ink);
+  padding-bottom:3px;border-bottom:1px solid var(--line-strong);
+  transition:border-color .2s ease;
+}
+.link-quiet:hover{border-color:var(--red)}
+
+/* fact strip */
+.strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.strip-row{
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:15px 28px;flex-wrap:wrap;
+}
+.strip-row span{
+  font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gray);
+}
+.strip-row i{width:4px;height:4px;background:var(--line-strong);flex:none}
+
+/* ---------- sections ---------- */
+section{padding:108px 0}
+section + section{border-top:1px solid var(--line)}
+.sec-head{max-width:62ch;margin-bottom:60px}
+.sec-head p{color:var(--gray);font-size:17px}
+
+/* problem */
+.problem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:36px}
+.problem-grid article{border-top:1px solid var(--line-strong);padding-top:22px}
+.problem-grid .n{font-size:13px;font-weight:500;color:var(--gray);display:block;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.problem-grid h3{font-size:16.5px;font-weight:600;margin-bottom:8px}
+.problem-grid p{font-size:15px;color:var(--gray);line-height:1.6}
+.thesis{
+  font-size:clamp(26px,3.2vw,38px);font-style:italic;font-weight:400;
+  line-height:1.3;text-align:center;max-width:32ch;margin:96px auto 0;
+}
+.thesis em{color:var(--red)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:32px;list-style:none}
+.steps li{border-top:1px solid var(--line-strong);padding-top:20px}
+.steps .n{font-size:13px;font-weight:500;color:var(--red);display:block;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.steps h3{font-size:15.5px;font-weight:600;margin-bottom:6px}
+.steps p{font-size:14px;color:var(--gray);line-height:1.55}
+.spec{
+  margin-top:68px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:14.5px;color:var(--gray);
+}
+.spec b{
+  font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ink);margin-right:14px;
+}
+
+/* use cases */
+.use-featured{
+  background:var(--tint);border-radius:8px;padding:42px 44px;
+  display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;
+  margin-bottom:22px;
+}
+.use-featured h3{font-size:20px;font-weight:600;margin-bottom:10px}
+.use-featured p{font-size:15.5px;color:var(--gray);max-width:62ch}
+.tag-new{
+  font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--red);white-space:nowrap;padding-top:6px;
+}
+.uses{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.uses article{
+  background:var(--tint);border-radius:8px;padding:34px 32px;
+  transition:box-shadow .25s ease;
+}
+.uses article:hover{box-shadow:0 14px 34px -22px rgba(23,21,18,.3)}
+.uses h3{font-size:16.5px;font-weight:600;margin-bottom:8px}
+.uses p{font-size:14.5px;color:var(--gray);line-height:1.6}
+
+/* traction */
+.trac{border-top:1px solid var(--line-strong)}
+.trac article{
+  display:grid;grid-template-columns:180px 1fr 1.3fr;gap:36px;align-items:baseline;
+  padding:28px 0;border-bottom:1px solid var(--line);
+}
+.trac .y{
+  font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--gray);
+}
+.trac h3{font-size:17.5px;font-weight:600}
+.trac p{font-size:15px;color:var(--gray)}
+
+/* ---------- contact / footer ---------- */
+.contact{background:var(--dark);color:#fff;border-top:0;padding:116px 0 0}
+.contact .label{color:#8F8A80}
+.contact h2{color:#fff}
+.contact .sec-head p{color:#A6A198}
+.contact-row{display:flex;align-items:center;gap:34px;flex-wrap:wrap;padding-bottom:110px}
+.mail{
+  font-size:19px;font-weight:500;color:#fff;text-decoration:none;
+  padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.35);
+  transition:border-color .2s ease;
+}
+.mail:hover{border-color:var(--red-hot)}
+footer{border-top:1px solid rgba(255,255,255,.1);padding:26px 0}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+footer span{font-size:13px;color:#8F8A80}
+footer .fbrand{font-size:12px;font-weight:700;letter-spacing:.22em;color:#fff}
+
+/* ---------- device ---------- */
+.device-col{max-width:430px;justify-self:end;width:100%}
+.device{
+  position:relative;
+  background:linear-gradient(180deg,#201D19,#161311);
+  border:1px solid #2C2823;border-radius:22px;
+  padding:16px 16px 20px;
+  box-shadow:0 30px 70px -30px rgba(20,18,14,.5), inset 0 1px 0 rgba(255,255,255,.07);
+}
+.device::before{ /* power button */
+  content:"";position:absolute;right:-4px;top:88px;width:4px;height:46px;
+  background:#0D0C0A;border-radius:0 3px 3px 0;
+}
+.dev-speaker{
+  width:52px;height:4px;border-radius:3px;background:#0C0B09;
+  margin:2px auto 14px;box-shadow:inset 0 1px 2px #000;
+}
+.screen{
+  background:var(--screen);border-radius:8px;padding:12px 12px 10px;
+  border:1px solid #000;min-height:318px;display:flex;flex-direction:column;
+  box-shadow:inset 0 0 0 1px #262220, inset 0 2px 14px rgba(0,0,0,.85);
+  font-family:'IBM Plex Mono',monospace;
+}
+.scr-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10.5px;color:#8F897E;padding-bottom:9px;
+  border-bottom:1px solid #201D1A;
+}
+.scr-bar .bnd{color:var(--red-hot);font-weight:500;letter-spacing:.3em}
+.scr-stat{display:flex;align-items:center;gap:9px}
+.sig{display:flex;align-items:flex-end;gap:1.5px;height:9px}
+.sig i{width:2.5px;background:#8F897E}
+.sig i:nth-child(1){height:3px}.sig i:nth-child(2){height:5px}
+.sig i:nth-child(3){height:7px}.sig i:nth-child(4){height:9px}
+.batt{width:16px;height:8px;border:1px solid #8F897E;border-radius:2px;position:relative;padding:1px}
+.batt::after{content:"";position:absolute;right:-3px;top:2px;width:2px;height:3px;background:#8F897E}
+.batt i{display:block;height:100%;width:78%;background:#8F897E}
+.scr-clock{font-variant-numeric:tabular-nums}
+.scr-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:14px 4px}
+.scr-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:#8F897E;padding-top:8px;border-top:1px solid #201D1A;
+}
+.scr-foot .grp{display:flex;gap:14px}
+.led{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:1px}
+.led.g{background:var(--ok);box-shadow:0 0 5px rgba(88,179,104,.7)}
+.scr-timer{font-variant-numeric:tabular-nums;color:#CFC9BF}
+
+/* screen: boot */
+.boot{display:flex;flex-direction:column;gap:9px;padding:0 8px;font-size:11.5px;color:#8F897E}
+.boot .blogo{
+  color:var(--red-hot);letter-spacing:.5em;font-size:15px;font-weight:500;
+  align-self:center;margin-bottom:10px;
+}
+.boot .ok{color:var(--ok)}
+
+/* screen: question */
+.scr-step{font-size:10px;letter-spacing:.16em;color:#877F73;text-align:center}
+.q{
+  color:#EDE8E0;font-size:15px;line-height:1.55;text-align:center;
+  min-height:70px;display:flex;align-items:center;justify-content:center;padding:0 6px;
+}
+.q .cursor{
+  display:inline-block;width:8px;height:16px;background:var(--red-hot);
+  margin-left:3px;vertical-align:-2px;animation:blink 1s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+.ans{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 6px}
+.ans button{
+  font-family:inherit;font-size:13px;font-weight:500;letter-spacing:.08em;
+  padding:13px 0;background:transparent;border:1px solid #46413A;border-radius:3px;
+  color:#EDE8E0;cursor:pointer;transition:background .15s,border-color .15s;
+}
+.ans button:hover{background:#1E1B17;border-color:#5C564E}
+.ans button.hit,.ans button:active{background:var(--red);border-color:var(--red)}
+.ans button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ans.single{grid-template-columns:1fr;max-width:180px;margin:0 auto;width:100%}
+
+/* screen: result */
+.res{display:flex;flex-direction:column;gap:12px;padding:0 6px}
+.lvl{align-self:flex-start;font-size:10px;letter-spacing:.14em;padding:4px 9px;border-radius:2px}
+.lvl.crit{background:var(--red);color:#fff}
+.lvl.high{color:var(--red-hot);border:1px solid var(--red-hot)}
+.lvl.mid{color:var(--amber);border:1px solid var(--amber)}
+.res .inst{font-size:13px;line-height:1.6;color:#EDE8E0}
+.res .dispatch{display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#B5AFA4;border-top:1px solid #201D1A;padding-top:10px}
+.res .dispatch span{opacity:0;transform:translateX(-6px);transition:opacity .35s ease,transform .35s ease}
+.res .dispatch span.in{opacity:1;transform:none}
+.res .dispatch .ok{color:var(--ok)}
+.res .dispatch .loc{color:var(--amber)}
+
+/* hardware bottom */
+.dev-bottom{display:flex;align-items:center;justify-content:center;position:relative;padding-top:18px}
+.sos{
+  width:58px;height:58px;border-radius:50%;cursor:pointer;
+  border:4px solid #0E0C0A;color:#fff;
+  font-family:'Archivo',sans-serif;font-size:11px;font-weight:700;letter-spacing:.1em;
+  background:radial-gradient(circle at 35% 30%,#D8353C,#9E1F24);
+  box-shadow:0 3px 8px rgba(0,0,0,.5), inset 0 2px 3px rgba(255,255,255,.25), inset 0 -3px 5px rgba(0,0,0,.35);
+  transition:transform .1s ease;
+}
+.sos:active{transform:scale(.94)}
+.sos:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.dev-model{
+  position:absolute;right:6px;bottom:2px;
+  font-size:9.5px;letter-spacing:.18em;color:#4A453E;
+}
+.dev-cap{
+  margin-top:16px;text-align:center;font-size:12.5px;color:var(--gray);
+}
+
+/* ---------- motion ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .rise{opacity:0;transform:translateY(16px);transition:opacity .65s ease,transform .65s ease}
+  .rise.in{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .q .cursor{animation:none}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr;gap:56px}
+  .device-col{justify-self:center}
+  .problem-grid{grid-template-columns:1fr 1fr;gap:30px}
+  .steps{grid-template-columns:1fr 1fr;gap:28px}
+  .uses{grid-template-columns:1fr}
+  .trac article{grid-template-columns:1fr;gap:6px;align-items:start}
+  .use-featured{grid-template-columns:1fr;padding:34px 30px}
+  .tag-new{order:-1;padding:0}
+}
+@media (max-width:640px){
+  section{padding:80px 0}
+  .hero{padding:60px 0 64px}
+  .nav-links{display:none}
+  .problem-grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr}
+  .strip-row{justify-content:flex-start}
+  .strip-row i{display:none}
+  .strip-row span{width:100%}
+  .strip-row{gap:8px;padding:14px 28px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#" aria-label="ALVOR — ana sayfa">
+      <svg viewBox="0 0 200 178" role="img" aria-hidden="true">
+        <g fill="none" stroke="#C1272D" stroke-width="24">
+          <path d="M100 26 L34 166"/>
+          <path d="M100 26 L166 166"/>
+        </g>
+        <path d="M22 154 h44 v12 H22 z" fill="#C1272D"/>
+        <path d="M134 154 h44 v12 h-44 z" fill="#C1272D"/>
+        <circle cx="100" cy="112" r="15" fill="none" stroke="#C1272D" stroke-width="11"/>
+        <rect x="94" y="126" width="12" height="40" fill="#C1272D"/>
+      </svg>
+      <span>ALVOR</span>
+    </a>
+    <div class="nav-right">
+      <nav class="nav-links">
+        <a href="#problem" data-tr="Problem" data-en="Problem">Problem</a>
+        <a href="#nasil" data-tr="Nasıl çalışır" data-en="How it works">Nasıl çalışır</a>
+        <a href="#alanlar" data-tr="Kullanım alanları" data-en="Use cases">Kullanım alanları</a>
+        <a href="#iletisim" data-tr="İletişim" data-en="Contact">İletişim</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Dil / Language">
+        <button id="btn-tr" class="on" aria-pressed="true" onclick="setLang('tr')">TR</button><i>/</i><button id="btn-en" aria-pressed="false" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="label" data-tr="Taşınabilir akıllı ilk yardım sistemi" data-en="Portable smart first-aid system">Taşınabilir akıllı ilk yardım sistemi</p>
+      <h1 data-tr-html="Panik anında <em>doğru karar</em>, doğru zaman." data-en-html="The <em>right decision</em>, right on time — even in panic.">Panik anında <em>doğru karar</em>, doğru zaman.</h1>
+      <p class="lead"
+         data-tr="ALVOR, acil durum anında kullanıcıya kritik soruları sorar; doğru ilk yardım adımını ekrandan ve sesli olarak yönlendirir. Konumu GPS ile alır, GSM üzerinden acil ekiplere otomatik bildirir."
+         data-en="In an emergency, ALVOR asks the user a few critical questions and guides the correct first-aid step on screen and by voice. It acquires the location via GPS and automatically notifies emergency services over GSM.">
+        ALVOR, acil durum anında kullanıcıya kritik soruları sorar; doğru ilk yardım adımını ekrandan ve sesli olarak yönlendirir. Konumu GPS ile alır, GSM üzerinden acil ekiplere otomatik bildirir.</p>
+      <div class="cta-row">
+        <a class="btn btn-red" href="mailto:alvor.resmi@gmail.com"><span data-tr="İletişime geç" data-en="Get in touch">İletişime geç</span><span class="arr" aria-hidden="true">→</span></a>
+        <a class="link-quiet" href="#nasil" data-tr="Nasıl çalışır?" data-en="How does it work?">Nasıl çalışır?</a>
+      </div>
+    </div>
+
+    <div class="device-col">
+      <figure class="device" aria-label="ALVOR cihaz demosu">
+        <div class="dev-speaker" aria-hidden="true"></div>
+        <div class="screen">
+          <div class="scr-bar">
+            <span class="bnd">ALVOR</span>
+            <span class="scr-stat" aria-hidden="true">
+              <span class="sig"><i></i><i></i><i></i><i></i></span>
+              <span class="batt"><i></i></span>
+              <span class="scr-clock" id="scrClock">--:--</span>
+            </span>
+          </div>
+          <div class="scr-body" id="scrBody" aria-live="polite"></div>
+          <div class="scr-foot">
+            <span class="grp">
+              <span><i class="led g"></i>GPS</span>
+              <span><i class="led g"></i>GSM</span>
+            </span>
+            <span class="scr-timer" id="scrTimer">00:00</span>
+          </div>
+        </div>
+        <div class="dev-bottom">
+          <button class="sos" id="sosBtn" data-tr-aria="Demoyu yeniden başlat" data-en-aria="Restart the demo" aria-label="Demoyu yeniden başlat">SOS</button>
+          <span class="dev-model" aria-hidden="true">ALVOR A-1</span>
+        </div>
+      </figure>
+      <figcaption class="dev-cap" data-tr="İnteraktif demo — cihaz arayüzünün temsilidir" data-en="Interactive demo — a representation of the device interface">İnteraktif demo — cihaz arayüzünün temsilidir</figcaption>
+    </div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="strip-row">
+    <span data-tr="GPS konum tespiti" data-en="GPS positioning">GPS konum tespiti</span><i></i>
+    <span data-tr="GSM acil bildirim" data-en="GSM emergency alert">GSM acil bildirim</span><i></i>
+    <span data-tr="Sesli yönlendirme" data-en="Voice guidance">Sesli yönlendirme</span><i></i>
+    <span data-tr="ESP32 gömülü sistem" data-en="ESP32 embedded system">ESP32 gömülü sistem</span>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="label" data-tr="Problem" data-en="The problem">Problem</p>
+      <h2 data-tr="Sorun bilgi eksikliği değil, panik." data-en="The problem isn't lack of knowledge. It's panic.">Sorun bilgi eksikliği değil, panik.</h2>
+      <p data-tr="Acil durumda insanların elinde bilgi vardır; eksik olan, o bilgiyi panik altında doğru sıraya koyabilmektir."
+         data-en="In an emergency, people usually have the information. What they lack is the ability to put it in the right order under panic.">
+        Acil durumda insanların elinde bilgi vardır; eksik olan, o bilgiyi panik altında doğru sıraya koyabilmektir.</p>
+    </div>
+    <div class="problem-grid rise">
+      <article>
+        <span class="n">01</span>
+        <h3 data-tr="Panik ve kararsızlık" data-en="Panic and indecision">Panik ve kararsızlık</h3>
+        <p data-tr="Stres altında karar verme yeteneği dramatik şekilde düşer." data-en="Decision-making ability drops dramatically under stress.">Stres altında karar verme yeteneği dramatik şekilde düşer.</p>
+      </article>
+      <article>
+        <span class="n">02</span>
+        <h3 data-tr="Yanlış müdahale" data-en="Wrong intervention">Yanlış müdahale</h3>
+        <p data-tr="Bilinçsiz müdahale, durumu daha da kötüleştirebilir." data-en="Untrained intervention can make things worse.">Bilinçsiz müdahale, durumu daha da kötüleştirebilir.</p>
+      </article>
+      <article>
+        <span class="n">03</span>
+        <h3 data-tr="Kritik zaman kaybı" data-en="Critical time loss">Kritik zaman kaybı</h3>
+        <p data-tr="İlk dakikalar hayatta kalma olasılığını belirler." data-en="The first minutes determine the chance of survival.">İlk dakikalar hayatta kalma olasılığını belirler.</p>
+      </article>
+      <article>
+        <span class="n">04</span>
+        <h3 data-tr="Bekleme süresi" data-en="Waiting time">Bekleme süresi</h3>
+        <p data-tr="Yardım ekipleri gelene kadar geçen süre kritik önemdedir." data-en="Time until responders arrive is critically important.">Yardım ekipleri gelene kadar geçen süre kritik önemdedir.</p>
+      </article>
+    </div>
+    <p class="thesis rise" data-tr-html="“Bilgi veren değil, <em>yönlendiren</em> sistem.”" data-en-html="“Not a system that informs — one that <em>guides</em>.”">“Bilgi veren değil, <em>yönlendiren</em> sistem.”</p>
+  </div>
+</section>
+
+<section id="nasil">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="label" data-tr="Nasıl çalışır" data-en="How it works">Nasıl çalışır</p>
+      <h2 data-tr="Beş adımda uçtan uca süreç." data-en="End-to-end in five steps.">Beş adımda uçtan uca süreç.</h2>
+    </div>
+    <ul class="steps rise">
+      <li><span class="n">01</span><h3 data-tr="Acil durum" data-en="Emergency">Acil durum</h3><p data-tr="Olay oluşur, kullanıcı cihazı açar." data-en="An incident occurs; the user turns on the device.">Olay oluşur, kullanıcı cihazı açar.</p></li>
+      <li><span class="n">02</span><h3 data-tr="Soru ve cevap" data-en="Q&amp;A">Soru ve cevap</h3><p data-tr="Kullanıcı kritik soruları yanıtlar." data-en="The user answers the critical questions.">Kullanıcı kritik soruları yanıtlar.</p></li>
+      <li><span class="n">03</span><h3 data-tr="Analiz" data-en="Analysis">Analiz</h3><p data-tr="Sistem durumu değerlendirir, doğru adımı gösterir." data-en="The system evaluates and shows the correct step.">Sistem durumu değerlendirir, doğru adımı gösterir.</p></li>
+      <li><span class="n">04</span><h3 data-tr="GPS konum" data-en="GPS location">GPS konum</h3><p data-tr="Konum otomatik olarak belirlenir." data-en="Location is acquired automatically.">Konum otomatik olarak belirlenir.</p></li>
+      <li><span class="n">05</span><h3 data-tr="Yardım çağrısı" data-en="Call-out">Yardım çağrısı</h3><p data-tr="GSM ile durum ve konum acil ekiplere iletilir." data-en="Status and location are sent to responders over GSM.">GSM ile durum ve konum acil ekiplere iletilir.</p></li>
+    </ul>
+    <p class="spec rise"
+       data-tr-html="<b>Donanım</b> ESP32 tabanlı gömülü sistem · TFT ekran · GPS modülü · GSM/GPRS modülü · sesli yönlendirme"
+       data-en-html="<b>Hardware</b> ESP32-based embedded system · TFT display · GPS module · GSM/GPRS module · voice guidance">
+      <b>Donanım</b> ESP32 tabanlı gömülü sistem · TFT ekran · GPS modülü · GSM/GPRS modülü · sesli yönlendirme</p>
+  </div>
+</section>
+
+<section id="alanlar">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="label" data-tr="Kullanım alanları" data-en="Use cases">Kullanım alanları</p>
+      <h2 data-tr="Yüksek insan yoğunluğu olan her alan." data-en="Anywhere people gather — and every vehicle on the road.">Yüksek insan yoğunluğu olan her alan.</h2>
+    </div>
+    <div class="use-featured rise">
+      <div>
+        <h3 data-tr="Araç içi ve filo güvenliği" data-en="In-vehicle &amp; fleet safety">Araç içi ve filo güvenliği</h3>
+        <p data-tr="Trafik kazası anında kazazedeyi yönlendiren, kaza konumunu acil ekiplere otomatik ileten araç içi güvenlik ekipmanı. Ticari filolar ve bireysel araçlar için."
+           data-en="In-vehicle safety equipment that guides occupants after a crash and automatically reports the location to responders. For commercial fleets and private vehicles.">
+          Trafik kazası anında kazazedeyi yönlendiren, kaza konumunu acil ekiplere otomatik ileten araç içi güvenlik ekipmanı. Ticari filolar ve bireysel araçlar için.</p>
+      </div>
+      <span class="tag-new" data-tr="Yeni" data-en="New">Yeni</span>
+    </div>
+    <div class="uses rise">
+      <article>
+        <h3 data-tr="Eğitim kurumları" data-en="Educational institutions">Eğitim kurumları</h3>
+        <p data-tr="Okullar, üniversiteler, yurtlar — en yüksek öncelikli segment." data-en="Schools, universities, dormitories — the highest-priority segment.">Okullar, üniversiteler, yurtlar — en yüksek öncelikli segment.</p>
+      </article>
+      <article>
+        <h3 data-tr="Toplu yaşam alanları" data-en="Public venues">Toplu yaşam alanları</h3>
+        <p data-tr="AVM'ler, spor tesisleri ve kamusal alanlar." data-en="Malls, sports facilities and public spaces.">AVM'ler, spor tesisleri ve kamusal alanlar.</p>
+      </article>
+      <article>
+        <h3 data-tr="Kamu kurumları" data-en="Public institutions">Kamu kurumları</h3>
+        <p data-tr="Belediyeler ve devlet kurumları — kurumsal satış potansiyeli." data-en="Municipalities and government bodies — institutional sales potential.">Belediyeler ve devlet kurumları — kurumsal satış potansiyeli.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="basarilar">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="label" data-tr="Yolculuk" data-en="Traction">Yolculuk</p>
+      <h2 data-tr="Fikirden çalışan prototipe." data-en="From idea to working prototype.">Fikirden çalışan prototipe.</h2>
+    </div>
+    <div class="trac rise">
+      <article>
+        <span class="y" data-tr="Hackathon" data-en="Hackathon">Hackathon</span>
+        <h3 data-tr="Çözüm Sende '26 — Türkiye 6.sı" data-en="Çözüm Sende '26 — 6th in Türkiye">Çözüm Sende '26 — Türkiye 6.sı</h3>
+        <p data-tr="Teknopark İstanbul Cube Incubation hackathonunda Türkiye genelinde altıncılık." data-en="6th place nationwide at the Teknopark Istanbul Cube Incubation hackathon.">Teknopark İstanbul Cube Incubation hackathonunda Türkiye genelinde altıncılık.</p>
+      </article>
+      <article>
+        <span class="y" data-tr="Kuluçka" data-en="Incubation">Kuluçka</span>
+        <h3 data-tr="BTM EGG Finalisti" data-en="BTM EGG Finalist">BTM EGG Finalisti</h3>
+        <p data-tr="BTM EGG programı finalisti; BTM Kamp kazanıldı." data-en="Finalist of the BTM EGG program; admitted to BTM Camp.">BTM EGG programı finalisti; BTM Kamp kazanıldı.</p>
+      </article>
+      <article>
+        <span class="y" data-tr="Fikri mülkiyet" data-en="IP">Fikri mülkiyet</span>
+        <h3 data-tr="“Patent Fikrim Var” — Kocaeli 5.si" data-en="“I Have a Patent Idea” — 5th in Kocaeli">“Patent Fikrim Var” — Kocaeli 5.si</h3>
+        <p data-tr="Yarışma derecesinin yanında çalışan MVP prototip tamamlandı." data-en="Alongside the competition ranking, the working MVP prototype was completed.">Yarışma derecesinin yanında çalışan MVP prototip tamamlandı.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="iletisim">
+  <div class="wrap">
+    <div class="sec-head rise">
+      <p class="label" data-tr="İletişim" data-en="Contact">İletişim</p>
+      <h2 data-tr="Pilot kurulum ve iş birlikleri için konuşalım." data-en="Let's talk pilots and partnerships.">Pilot kurulum ve iş birlikleri için konuşalım.</h2>
+      <p data-tr="Eğitim kurumları, belediyeler, filo operatörleri ve sponsorlar — ALVOR'u sahada birlikte test edelim."
+         data-en="Schools, municipalities, fleet operators and sponsors — let's field-test ALVOR together.">
+        Eğitim kurumları, belediyeler, filo operatörleri ve sponsorlar — ALVOR'u sahada birlikte test edelim.</p>
+    </div>
+    <div class="contact-row rise">
+      <a class="btn btn-red" href="mailto:alvor.resmi@gmail.com"><span data-tr="E-posta gönder" data-en="Send an email">E-posta gönder</span><span class="arr" aria-hidden="true">→</span></a>
+      <a class="mail" href="mailto:alvor.resmi@gmail.com">alvor.resmi@gmail.com</a>
+    </div>
+  </div>
+  <footer>
+    <div class="wrap">
+      <span class="fbrand" aria-hidden="true">ALVOR</span>
+      <span data-tr="© 2026 ALVOR — Muhammed Şenli. Tüm hakları saklıdır." data-en="© 2026 ALVOR — Muhammed Şenli. All rights reserved.">© 2026 ALVOR — Muhammed Şenli. Tüm hakları saklıdır.</span>
+    </div>
+  </footer>
+</section>
+
+<script>
+/* ================= i18n ================= */
+var lang = 'tr';
+
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  var tr = document.getElementById('btn-tr'), en = document.getElementById('btn-en');
+  tr.classList.toggle('on', l === 'tr'); tr.setAttribute('aria-pressed', l === 'tr');
+  en.classList.toggle('on', l === 'en'); en.setAttribute('aria-pressed', l === 'en');
+  document.querySelectorAll('[data-tr]').forEach(function(el){
+    el.textContent = el.getAttribute('data-' + l);
+  });
+  document.querySelectorAll('[data-tr-html]').forEach(function(el){
+    el.innerHTML = el.getAttribute('data-' + l + '-html');
+  });
+  document.querySelectorAll('[data-tr-aria]').forEach(function(el){
+    el.setAttribute('aria-label', el.getAttribute('data-' + l + '-aria'));
+  });
+  document.title = (l === 'tr')
+    ? 'ALVOR — Panik anında doğru karar, doğru zaman'
+    : 'ALVOR — The right decision, right on time';
+  renderScreen(true); /* mevcut ekranı aynı adımda, yeni dilde çiz */
+}
+
+/* ================= cihaz simülasyonu ================= */
+/* Basit ilk yardım karar ağacı — cevaplar sonucu gerçekten değiştirir. */
+var TREE = {
+  q1:  { t:{tr:'Kişi bilinçli mi?',                 en:'Is the person conscious?'},           yes:'q2a', no:'q2b' },
+  q2a: { t:{tr:'Nefes almakta zorlanıyor mu?',      en:'Is the person struggling to breathe?'}, yes:'rBreath', no:'q3' },
+  q2b: { t:{tr:'Nefes alıyor mu?',                  en:'Is the person breathing?'},            yes:'rRecov', no:'rCpr' },
+  q3:  { t:{tr:'Görünür ciddi kanama var mı?',      en:'Is there severe visible bleeding?'},   yes:'rBleed', no:'rObs' }
+};
+
+var RESULTS = {
+  rCpr: {
+    lvl:'crit',
+    inst:{ tr:'Kalp masajına başlayın: göğüs kafesinin tam ortasına, dakikada 100–120 tempoyla sert ve kesintisiz bası uygulayın. Yardım gelene kadar durmayın.',
+           en:'Start CPR: push hard and fast in the centre of the chest, 100–120 compressions per minute. Do not stop until help arrives.' },
+    sms:{ tr:'112 bilgilendirildi — KRİTİK VAKA + KONUM', en:'112 notified — CRITICAL CASE + LOCATION' }
+  },
+  rRecov: {
+    lvl:'high',
+    inst:{ tr:'Kişiyi yan yatırın (kurtarma pozisyonu). Hava yolunu açık tutun, nefesini sürekli izleyin.',
+           en:'Place the person on their side (recovery position). Keep the airway open and monitor breathing continuously.' },
+    sms:{ tr:'112 SMS iletildi — vaka türü + konum', en:'112 SMS sent — case type + location' }
+  },
+  rBreath: {
+    lvl:'high',
+    inst:{ tr:'Kişiyi dik oturtun, kıyafetlerini gevşetin ve sakin kalmasını sağlayın. Nefes durumunu izleyin.',
+           en:'Sit the person upright, loosen tight clothing and keep them calm. Monitor their breathing.' },
+    sms:{ tr:'112 SMS iletildi — vaka türü + konum', en:'112 SMS sent — case type + location' }
+  },
+  rBleed: {
+    lvl:'high',
+    inst:{ tr:'Temiz bir bezle yaranın üzerine doğrudan ve kesintisiz baskı uygulayın. Bezi kaldırmayın, baskıyı sürdürün.',
+           en:'Apply firm, continuous pressure on the wound with a clean cloth. Do not lift the cloth — keep pressing.' },
+    sms:{ tr:'112 SMS iletildi — vaka türü + konum', en:'112 SMS sent — case type + location' }
+  },
+  rObs: {
+    lvl:'mid',
+    inst:{ tr:'Kişiyi rahat bir pozisyonda tutun. Bilincini ve nefesini düzenli aralıklarla kontrol edin.',
+           en:'Keep the person in a comfortable position. Check consciousness and breathing at regular intervals.' },
+    sms:{ tr:'112 SMS iletildi — durum bildirimi + konum', en:'112 SMS sent — status report + location' }
+  }
+};
+
+var UI = {
+  tr:{ yes:'EVET', no:'HAYIR', restart:'BAŞA DÖN', step:'DEĞERLENDİRME · SORU ',
+       lvl:{ crit:'ÖNCELİK · KRİTİK', high:'ÖNCELİK · YÜKSEK', mid:'ÖNCELİK · ORTA' },
+       loc:'Konum alındı — 40.7654K 29.9408D', voice:'Sesli yönlendirme etkin',
+       boot:['öz sınama', 'GPS modülü', 'GSM şebekesi'], bootOk:'TAMAM' },
+  en:{ yes:'YES', no:'NO', restart:'RESTART', step:'ASSESSMENT · QUESTION ',
+       lvl:{ crit:'PRIORITY · CRITICAL', high:'PRIORITY · HIGH', mid:'PRIORITY · MODERATE' },
+       loc:'Location fixed — 40.7654N 29.9408E', voice:'Voice guidance active',
+       boot:['self-test', 'GPS module', 'GSM network'], bootOk:'OK' }
+};
+
+var scrBody = document.getElementById('scrBody');
+var sim = { mode:'boot', node:'q1', qnum:1 };
+var timers = [];
+var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+function clearLater(){ timers.forEach(clearTimeout); timers = []; }
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+/* --- geçen süre sayacı --- */
+var elapsed = 0, elapsedInt = null;
+function startTimer(){
+  stopTimer(); elapsed = 0; paintTimer();
+  elapsedInt = setInterval(function(){ elapsed++; paintTimer(); }, 1000);
+}
+function stopTimer(){ if(elapsedInt){ clearInterval(elapsedInt); elapsedInt = null; } }
+function paintTimer(){
+  var m = String(Math.floor(elapsed / 60)).padStart(2,'0');
+  var s = String(elapsed % 60).padStart(2,'0');
+  document.getElementById('scrTimer').textContent = m + ':' + s;
+}
+
+/* --- ekran çizimleri --- */
+function renderScreen(instant){
+  clearLater();
+  if(sim.mode === 'boot')      renderBoot(instant);
+  else if(sim.mode === 'question') renderQuestion(instant);
+  else                         renderResult(instant);
+}
+
+function renderBoot(instant){
+  var u = UI[lang];
+  var lines = u.boot.map(function(l){
+    return '<span>&gt; ' + esc(l) + ' ... <b class="ok">' + u.bootOk + '</b></span>';
+  });
+  scrBody.innerHTML = '<div class="boot"><span class="blogo">ALVOR</span>' +
+    '<div id="bootLines" style="display:flex;flex-direction:column;gap:9px"></div></div>';
+  var box = document.getElementById('bootLines');
+  if(instant || reduceMotion){
+    box.innerHTML = lines.join('');
+    later(bootDone, instant ? 600 : 400);
+  } else {
+    lines.forEach(function(html, i){
+      later(function(){ box.insertAdjacentHTML('beforeend', html); }, 350 + i * 380);
+    });
+    later(bootDone, 350 + lines.length * 380 + 450);
+  }
+}
+function bootDone(){
+  sim.mode = 'question'; sim.node = 'q1'; sim.qnum = 1;
+  startTimer();
+  renderScreen(false);
+}
+
+function renderQuestion(instant){
+  var u = UI[lang], node = TREE[sim.node];
+  scrBody.innerHTML =
+    '<p class="scr-step">' + u.step + sim.qnum + '</p>' +
+    '<p class="q"><span id="qText"></span><span class="cursor" aria-hidden="true"></span></p>' +
+    '<div class="ans">' +
+      '<button onclick="answer(this,\'yes\')">' + u.yes + '</button>' +
+      '<button onclick="answer(this,\'no\')">' + u.no + '</button>' +
+    '</div>';
+  var text = node.t[lang];
+  var el = document.getElementById('qText');
+  if(instant || reduceMotion){ el.textContent = text; return; }
+  var i = 0;
+  (function tick(){
+    if(!el.isConnected) return;
+    el.textContent = text.slice(0, ++i);
+    if(i < text.length) later(tick, 26);
+  })();
+}
+
+function answer(btn, a){
+  btn.classList.add('hit');
+  var target = TREE[sim.node][a];
+  later(function(){
+    if(TREE[target]){ sim.node = target; sim.qnum++; sim.mode = 'question'; }
+    else            { sim.node = target; sim.mode = 'result'; }
+    renderScreen(false);
+  }, 180);
+}
+
+function renderResult(instant){
+  var u = UI[lang], r = RESULTS[sim.node];
+  scrBody.innerHTML =
+    '<div class="res">' +
+      '<span class="lvl ' + r.lvl + '">' + u.lvl[r.lvl] + '</span>' +
+      '<p class="inst">' + esc(r.inst[lang]) + '</p>' +
+      '<div class="dispatch">' +
+        '<span><b class="loc">◉</b> ' + esc(u.loc) + '</span>' +
+        '<span><b class="ok">✓</b> ' + esc(r.sms[lang]) + '</span>' +
+        '<span><b class="ok">✓</b> ' + esc(u.voice) + '</span>' +
+      '</div>' +
+      '<div class="ans single"><button onclick="restartSim()">' + u.restart + '</button></div>' +
+    '</div>';
+  var rows = scrBody.querySelectorAll('.dispatch span');
+  if(instant || reduceMotion){
+    rows.forEach(function(s){ s.classList.add('in'); });
+  } else {
+    rows.forEach(function(s, i){
+      later(function(){ s.classList.add('in'); }, 350 + i * 420);
+    });
+  }
+}
+
+function restartSim(){
+  clearLater(); stopTimer();
+  elapsed = 0; paintTimer();
+  sim = { mode:'boot', node:'q1', qnum:1 };
+  renderScreen(false);
+}
+document.getElementById('sosBtn').addEventListener('click', restartSim);
+
+/* --- ekran saati --- */
+function tickClock(){
+  var d = new Date();
+  document.getElementById('scrClock').textContent =
+    String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+tickClock(); setInterval(tickClock, 15000);
+
+/* ================= scroll reveal ================= */
+if('IntersectionObserver' in window){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold:.12 });
+  document.querySelectorAll('.rise').forEach(function(el){ io.observe(el); });
+} else {
+  document.querySelectorAll('.rise').forEach(function(el){ el.classList.add('in'); });
+}
+
+/* ================= init ================= */
+renderScreen(false);
+</script>
+</body>
+</html>
